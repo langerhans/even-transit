@@ -1,0 +1,19 @@
+{
+  "package_id": "de.langerhans.even-transport",
+  "edition": "202602",
+  "name": "Even Transport",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Public transport info for Even G2",
+  "description": "Provides public transport information for Even G2, using the Transitous API.",
+  "author": "langerhans",
+  "entrypoint": "index.html",
+  "permissions": {
+    "network": [
+      "evenhub.evenrealities.com"
+    ],
+    "fs": [
+      "./assets"
+    ]
+  }
+}
