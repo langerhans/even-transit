@@ -10,7 +10,7 @@ import { ListItem } from 'even-toolkit/web/list-item';
 import { ScreenHeader } from 'even-toolkit/web/screen-header';
 import { SectionHeader } from 'even-toolkit/web/section-header';
 import { EmptyState } from 'even-toolkit/web/empty-state';
-import { IcNavDirection } from 'even-toolkit/web/icons/svg-icons';
+import { IcEditTrash, IcNavDirection } from 'even-toolkit/web/icons/svg-icons';
 
 interface SavedConnection {
   id: string;
@@ -19,6 +19,7 @@ interface SavedConnection {
 }
 
 const STORAGE_KEY = 'even_transport_connections';
+const TYPEAHEAD_DELAY_MS = 300;
 
 interface AppProps {
   bridge: EvenAppBridge;
@@ -46,6 +47,32 @@ export default function App({ bridge }: AppProps) {
     }
     load();
   }, [bridge]);
+
+  useEffect(() => {
+    if (selectedFrom || fromSearch.length < 3) {
+      setFromResults([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      void handleSearch(fromSearch, setFromResults);
+    }, TYPEAHEAD_DELAY_MS);
+
+    return () => clearTimeout(timeoutId);
+  }, [fromSearch, selectedFrom]);
+
+  useEffect(() => {
+    if (selectedTo || toSearch.length < 3) {
+      setToResults([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      void handleSearch(toSearch, setToResults);
+    }, TYPEAHEAD_DELAY_MS);
+
+    return () => clearTimeout(timeoutId);
+  }, [toSearch, selectedTo]);
 
   const saveConnections = async (newConns: SavedConnection[]) => {
     setConnections(newConns);
@@ -99,21 +126,32 @@ export default function App({ bridge }: AppProps) {
           />
         ) : (
           connections.map(conn => (
-            <ListItem
-              key={conn.id}
-              title={conn.from.name}
-              subtitle={`to ${conn.to.name}`}
-              leading={<IcNavDirection width={20} height={20} />}
-              onDelete={() => deleteConnection(conn.id)}
-            />
+            <Card key={conn.id} padding="none">
+              <div className="flex items-center gap-3 px-3 py-4">
+                <IcNavDirection width={20} height={20} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[17px] font-normal text-text truncate">From: {conn.from.name}</p>
+                  <p className="text-[17px] font-normal text-text truncate">To: {conn.to.name}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => deleteConnection(conn.id)}
+                  aria-label={`Delete connection from ${conn.from.name} to ${conn.to.name}`}
+                  className="shrink-0 p-1 text-text-dim"
+                >
+                  <IcEditTrash width={20} height={20} />
+                </button>
+              </div>
+            </Card>
           ))
         )}
       </div>
 
       {/* Add New Connection */}
-      <Card padding="lg">
-        <SectionHeader title="Add Connection" />
-        <div className="flex flex-col gap-4 mt-3">
+      <Card padding="none">
+        <div className="px-6 pb-6 pt-1">
+          <SectionHeader title="Add Connection" />
+          <div className="flex flex-col gap-4 mt-3">
           {/* From */}
           <div className="relative">
             <label className="block mb-1 text-[13px] font-medium">From</label>
@@ -122,7 +160,6 @@ export default function App({ bridge }: AppProps) {
               onChange={(e) => {
                 setFromSearch(e.target.value);
                 setSelectedFrom(null);
-                handleSearch(e.target.value, setFromResults);
               }}
               placeholder="Search start station..."
             />
@@ -151,7 +188,6 @@ export default function App({ bridge }: AppProps) {
               onChange={(e) => {
                 setToSearch(e.target.value);
                 setSelectedTo(null);
-                handleSearch(e.target.value, setToResults);
               }}
               placeholder="Search destination..."
             />
@@ -173,14 +209,15 @@ export default function App({ bridge }: AppProps) {
           </div>
         </div>
 
-        <Button
-          variant="highlight"
-          className="w-full mt-4"
-          onClick={addConnection}
-          disabled={!selectedFrom || !selectedTo}
-        >
-          Save Connection
-        </Button>
+          <Button
+            variant="highlight"
+            className="w-full mt-4"
+            onClick={addConnection}
+            disabled={!selectedFrom || !selectedTo}
+          >
+            Save Connection
+          </Button>
+        </div>
       </Card>
     </div>
   );
