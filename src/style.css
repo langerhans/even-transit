@@ -1,9 +1,40 @@
 @import "tailwindcss";
-@import "../node_modules/@jappyjan/even-realities-ui/dist/even-realities-ui.css";
+@import "even-toolkit/web/theme-light.css";
+@import "even-toolkit/web/typography.css";
+@import "even-toolkit/web/utilities.css";
+
+/* Scan toolkit components so Tailwind generates their utility classes */
+@source "../node_modules/even-toolkit/dist/web";
+
+/* Register toolkit design tokens as Tailwind theme colors.
+   @theme inline avoids re-emitting CSS vars already defined by tokens-light.css. */
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-light: var(--color-surface-light);
+  --color-surface-lighter: var(--color-surface-lighter);
+  --color-border: var(--color-border);
+  --color-border-light: var(--color-border-light);
+  --color-accent: var(--color-accent);
+  --color-accent-alpha: var(--color-accent-alpha);
+  --color-accent-warning: var(--color-accent-warning);
+  --color-positive: var(--color-positive);
+  --color-positive-alpha: var(--color-positive-alpha);
+  --color-negative: var(--color-negative);
+  --color-negative-alpha: var(--color-negative-alpha);
+  --color-overlay: var(--color-overlay);
+  --color-input-bg: var(--color-input-bg);
+  --color-text: var(--color-text);
+  --color-text-dim: var(--color-text-dim);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-highlight: var(--color-text-highlight);
+}
 
 body {
   margin: 0;
   min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 #app {

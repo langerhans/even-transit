@@ -23,11 +23,14 @@
   },
   "dependencies": {
     "@evenrealities/even_hub_sdk": "^0.0.7",
-    "@jappyjan/even-realities-ui": "^0.0.8",
     "@motis-project/motis-client": "^2.8.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "even-toolkit": "^1.1.2",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "tailwind-merge": "^3.5.0"
   }
 }

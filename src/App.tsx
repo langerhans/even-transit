@@ -3,18 +3,14 @@ import type { Place } from './config';
 import { searchStation } from './motis';
 import { renderHome } from './pages/home';
 import type { EvenAppBridge } from '@evenrealities/even_hub_sdk';
-import {
-  Button,
-  Card,
-  CardHeader,
-  CardContent,
-  CardFooter,
-  Input,
-  Text,
-  IconButton,
-  TrashIcon,
-  NavigateIcon,
-} from '@jappyjan/even-realities-ui';
+import { Button } from 'even-toolkit/web/button';
+import { Card } from 'even-toolkit/web/card';
+import { Input } from 'even-toolkit/web/input';
+import { ListItem } from 'even-toolkit/web/list-item';
+import { ScreenHeader } from 'even-toolkit/web/screen-header';
+import { SectionHeader } from 'even-toolkit/web/section-header';
+import { EmptyState } from 'even-toolkit/web/empty-state';
+import { IcNavDirection } from 'even-toolkit/web/icons/svg-icons';
 
 interface SavedConnection {
   id: string;
@@ -91,49 +87,37 @@ export default function App({ bridge }: AppProps) {
 
   return (
     <div className="py-6 px-3">
-      <Text as="h1" variant="title-xl" className="mb-4">
-        Connections
-      </Text>
+      <ScreenHeader title="Connections" />
 
       {/* Saved Connections */}
       <div className="flex flex-col gap-2 mb-6">
-        {connections.length === 0 && (
-          <Text variant="body-2" className="text-tc-2 py-4">No saved connections.</Text>
+        {connections.length === 0 ? (
+          <EmptyState
+            icon={<IcNavDirection width={32} height={32} />}
+            title="No saved connections"
+            description="Add a connection below to get started."
+          />
+        ) : (
+          connections.map(conn => (
+            <ListItem
+              key={conn.id}
+              title={conn.from.name}
+              subtitle={`to ${conn.to.name}`}
+              leading={<IcNavDirection width={20} height={20} />}
+              onDelete={() => deleteConnection(conn.id)}
+            />
+          ))
         )}
-        {connections.map(conn => (
-          <Card key={conn.id} className="w-full">
-            <CardContent className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <NavigateIcon size={20} className="text-tc-2 shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <Text variant="title-2" className="block truncate">{conn.from.name}</Text>
-                  <Text variant="detail" className="text-tc-2 block truncate">to {conn.to.name}</Text>
-                </div>
-              </div>
-              <IconButton
-                variant="negative"
-                size="sm"
-                onClick={() => deleteConnection(conn.id)}
-                aria-label="Delete connection"
-              >
-                <TrashIcon size={16} />
-              </IconButton>
-            </CardContent>
-          </Card>
-        ))}
       </div>
 
       {/* Add New Connection */}
-      <Card className="w-full">
-        <CardHeader>
-          <Text variant="title-1">Add Connection</Text>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+      <Card padding="lg">
+        <SectionHeader title="Add Connection" />
+        <div className="flex flex-col gap-4 mt-3">
           {/* From */}
           <div className="relative">
-            <Text as="label" variant="subtitle" className="block mb-1">From</Text>
+            <label className="block mb-1 text-[13px] font-medium">From</label>
             <Input
-              className="w-full"
               value={fromSearch}
               onChange={(e) => {
                 setFromSearch(e.target.value);
@@ -143,19 +127,17 @@ export default function App({ bridge }: AppProps) {
               placeholder="Search start station..."
             />
             {fromSearch && !selectedFrom && fromResults.length > 0 && (
-              <Card className="absolute left-0 right-0 mt-1 max-h-48 overflow-auto z-10">
+              <Card className="absolute left-0 right-0 mt-1 max-h-48 overflow-auto z-10" padding="none">
                 {fromResults.map(p => (
-                  <div
+                  <ListItem
                     key={p.id}
-                    className="px-4 py-2.5 cursor-pointer hover:bg-bc-2 active:bg-bc-3 transition"
-                    onClick={() => {
+                    title={p.name}
+                    onPress={() => {
                       setSelectedFrom(p);
                       setFromSearch(p.name);
                       setFromResults([]);
                     }}
-                  >
-                    <Text variant="body-2">{p.name}</Text>
-                  </div>
+                  />
                 ))}
               </Card>
             )}
@@ -163,9 +145,8 @@ export default function App({ bridge }: AppProps) {
 
           {/* To */}
           <div className="relative">
-            <Text as="label" variant="subtitle" className="block mb-1">To</Text>
+            <label className="block mb-1 text-[13px] font-medium">To</label>
             <Input
-              className="w-full"
               value={toSearch}
               onChange={(e) => {
                 setToSearch(e.target.value);
@@ -175,34 +156,31 @@ export default function App({ bridge }: AppProps) {
               placeholder="Search destination..."
             />
             {toSearch && !selectedTo && toResults.length > 0 && (
-              <Card className="absolute left-0 right-0 mt-1 max-h-48 overflow-auto z-10">
+              <Card className="absolute left-0 right-0 mt-1 max-h-48 overflow-auto z-10" padding="none">
                 {toResults.map(p => (
-                  <div
+                  <ListItem
                     key={p.id}
-                    className="px-4 py-2.5 cursor-pointer hover:bg-bc-2 active:bg-bc-3 transition"
-                    onClick={() => {
+                    title={p.name}
+                    onPress={() => {
                       setSelectedTo(p);
                       setToSearch(p.name);
                       setToResults([]);
                     }}
-                  >
-                    <Text variant="body-2">{p.name}</Text>
-                  </div>
+                  />
                 ))}
               </Card>
             )}
           </div>
-        </CardContent>
-        <CardFooter>
-          <Button
-            variant="primary"
-            className="w-full"
-            onClick={addConnection}
-            disabled={!selectedFrom || !selectedTo}
-          >
-            Save Connection
-          </Button>
-        </CardFooter>
+        </div>
+
+        <Button
+          variant="highlight"
+          className="w-full mt-4"
+          onClick={addConnection}
+          disabled={!selectedFrom || !selectedTo}
+        >
+          Save Connection
+        </Button>
       </Card>
     </div>
   );
