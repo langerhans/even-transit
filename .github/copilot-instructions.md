@@ -31,7 +31,39 @@ The app has two parallel UIs that share local storage via the Even Hub Bridge:
 - Double-click → go back (DETAILS → RESULTS → HOME)
 - List selection → go forward (HOME → fetch connections → RESULTS → DETAILS)
 
-## Even Hub SDK Conventions
+## Phone UI — even-toolkit/web
+
+The phone UI uses `even-toolkit/web` for all design system components. Import components from their individual subpaths:
+
+```typescript
+import { Button } from 'even-toolkit/web/button';
+import { Card } from 'even-toolkit/web/card';
+import { Input } from 'even-toolkit/web/input';
+import { ListItem } from 'even-toolkit/web/list-item';
+import { ScreenHeader } from 'even-toolkit/web/screen-header';
+import { SectionHeader } from 'even-toolkit/web/section-header';
+import { EmptyState } from 'even-toolkit/web/empty-state';
+import { IcNavDirection } from 'even-toolkit/web/icons/svg-icons';
+```
+
+**Key component notes:**
+- `Button` uses `variant="highlight"` for primary actions (not `"primary"`).
+- `Card` has no sub-components — use `padding` prop (`"none"`, `"sm"`, `"default"`, `"lg"`) and structure content inside it directly.
+- `ListItem` accepts `title`, `subtitle`, `leading` (ReactNode), `trailing` (ReactNode), `onPress`, and `onDelete` (swipe-to-delete). Use instead of custom card rows.
+- Icons are SVG components from `even-toolkit/web/icons/svg-icons` (e.g. `IcNavDirection`, `IcEditTrash`). Set size via `width`/`height` props.
+
+**Tailwind + even-toolkit theming (critical):** The toolkit's components use Tailwind utility classes that reference CSS custom properties (`bg-surface`, `text-text`, `bg-accent`, etc.). Two things are required in `src/style.css` for this to work with Tailwind v4:
+
+1. **`@source`** — Tailwind v4 doesn't scan `node_modules` by default. The directive `@source "../node_modules/even-toolkit/dist/web"` tells Tailwind to scan the toolkit's compiled JS for class names.
+2. **`@theme inline`** — Maps the toolkit's CSS custom properties (from `tokens-light.css`) to Tailwind theme values so utility classes like `bg-surface` and `text-text-dim` are generated. Without this, toolkit components render unstyled.
+
+If adding new even-toolkit components that appear unstyled, check that their Tailwind classes are covered by the existing `@source` and `@theme` blocks.
+
+**Design token colors:** Use toolkit tokens, not raw Tailwind colors. Examples: `bg-surface` (card bg), `bg-bg` (page bg), `text-text` (primary text), `text-text-dim` (secondary text), `bg-accent` (highlight bg), `text-text-highlight` (text on accent), `bg-positive`/`bg-negative` (status).
+
+**Typography:** Only use the toolkit's 8 defined sizes (24/20/17/15/13/11px) with matching negative letter-spacing. No `font-bold` or `font-semibold` — only `font-normal` (400) or `font-light` (300). Components like `ScreenHeader` and `SectionHeader` handle typography automatically.
+
+## Glasses UI — Even Hub SDK Conventions
 
 **Always use `new ClassName({...})` — never plain object literals.** The SDK interfaces include a `toJson()` method, so object literals cause TypeScript errors:
 
